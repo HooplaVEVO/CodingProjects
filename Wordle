@@ -1,0 +1,126 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class Wordle {
+    public final static String word = chooseWord();
+
+    public static void main(String[] args) {
+        runGame();
+    }
+
+    public static String chooseWord() {//method that chooses a five letter word at random from an array
+        Random rand = new Random();
+        String[] wordList = {"SMILE", "MEANT", "DEALT", "EPOXY", "DRAIN", "ADULT", "STRAW", "TEARS", "DREAD", "SEVEN",
+                "ABROAD", "FUTURE", "LESSON", "POCKET", "SEASON", "HABITAT", "ABILITY"};
+        String word = wordList[rand.nextInt(wordList.length)];
+        return word;
+    }
+
+    public static void runGame() { //This method runs the game
+        int tries = 0;
+        boolean end = false;
+        String guess;
+        System.out.println("Please enter a " + toString(word.length()) + " letter word to begin");
+        while (!end) {
+            guess = guessLoop();
+            tries++;
+            System.out.println(formatLetters(compareWords(guess), guess));
+            if (gameWin(compareWords(guess))) {
+                end = true;
+                System.out.println("Congratulations, you won in " + tries + " guesses");
+            } else if (tries == 6) {
+                end = true;
+                System.out.println("Game over. The correct word was: " + word);
+            }
+        }
+    }
+
+    public static int[] compareWords(String guess) {
+        /*
+        This function takes the user guess and returns an array of integers denoting correct letters
+        with correct positioning,incorrect positioning and incorrect letters.
+         */
+        int[] numberSlots = new int[word.length()];
+        guess = guess.toUpperCase();
+        for (int i = 0; i < word.length(); i++) {
+            if (guess.charAt(i) == word.charAt(i)) {
+                numberSlots[i] = 2;
+            }
+            for (int a = 0; a < word.length(); a++) {
+                if (guess.charAt(i) == word.charAt(a)) {
+                    if (numberSlots[i] != 2) {
+                        numberSlots[i] = 1;
+                    }
+                }
+            }
+        }
+        return numberSlots;
+    }
+
+    public static String formatLetters(int[] numberSlots, String guess) {
+        /*
+        This function takes an array denoting number slots and returns a string with brackets
+        around them
+         */
+        String result = "";
+        guess = guess.toUpperCase();
+        for (int i = 0; i < word.length(); i++) {
+            if (numberSlots[i] == 2) {
+                result += "|[" + guess.charAt(i) + "]";
+            } else if (numberSlots[i] == 1) {
+                result += "|{" + guess.charAt(i) + "}";
+            } else {
+                result += "| " + guess.charAt(i) + " ";
+            }
+        }
+        result += "|";
+        return result;
+    }
+
+    public static boolean gameWin(int[] numberSlots) {//This function checks for game win
+        boolean result = false;
+        if (numberSlots[0] == 2 && numberSlots[1] == 2 && numberSlots[2] == 2 && numberSlots[3] == 2 && numberSlots[4] == 2) {
+            result = true;
+        }
+        return result;
+    }
+
+    public static String toString(int wordLength) {
+        /*
+        This method takes an integer and returns the word.
+        */
+        String result;
+        if (wordLength == 5) {
+            result = "five";
+        } else if (wordLength == 6) {
+            result = "six";
+        } else {
+            result = "seven";
+        }
+        return result;
+    }
+
+    public static boolean letterCount(String s) {
+        //This method returns true if the guess is the same length as the correct word length.
+        boolean result = false;
+        if (s.length() == word.length()) {
+            result = true;
+        }
+        return result;
+    }
+
+    public static String guessLoop() {
+        //This method prompts the user for a guess and only returns the String when they guess the correct word length
+        String result;
+        while (true) {
+            Scanner input = new Scanner(System.in);
+            result = input.nextLine();
+            if (result.length() == word.length()) {
+                break;
+            } else {
+                System.out.println("Please guess a " + toString(word.length()) + " letter word");
+            }
+        }
+        return result;
+    }
+}
